@@ -21,7 +21,7 @@ func newTemplateWithFuncMaps(funcMaps template.FuncMap) *template.Template {
 	return tpl
 }
 
-func generate(w io.Writer, pkg string, typ string, args []string) error {
+func generate(w io.Writer, pkg string, typ string, buildTags string, args []string) error {
 	eventNames, argTypesMap, err := parseArgs(args)
 	if err != nil {
 		return err
@@ -54,6 +54,7 @@ func generate(w io.Writer, pkg string, typ string, args []string) error {
 		"PackageName":       pkg,
 		"PublisherTypeName": typ,
 		"EventNames":        eventNames,
+		"BuildTags":         buildTags,
 	})
 }
 

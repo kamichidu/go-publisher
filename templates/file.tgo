@@ -1,3 +1,5 @@
+{{if .BuildTags}}// +build {{.BuildTags}}
+{{end}}
 package {{.PackageName}}
 
 // This is auto generated code by https://github.com/kamichidu/go-publisher

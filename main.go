@@ -23,6 +23,7 @@ func run(in io.Reader, out io.Writer, errOut io.Writer, args []string) int {
 		typName     string
 		ofilename   string
 		noGofmtFlag bool
+		buildTags   string
 	)
 	flg := flag.NewFlagSet(filepath.Base(args[0]), flag.ExitOnError)
 	flg.BoolVar(&versionFlag, "v", false, "Show version")
@@ -30,6 +31,7 @@ func run(in io.Reader, out io.Writer, errOut io.Writer, args []string) int {
 	flg.StringVar(&typName, "t", "", "Publisher type name")
 	flg.StringVar(&ofilename, "o", "-", "Output filename")
 	flg.BoolVar(&noGofmtFlag, "no-gofmt", false, "Don't use gofmt for generated go code")
+	flg.StringVar(&buildTags, "tags", "", "go's build tags placed at top of generated code")
 	if err := flg.Parse(args[1:]); err != nil {
 		log.Printf("Argument error: %s", err)
 		return 128
@@ -41,7 +43,7 @@ func run(in io.Reader, out io.Writer, errOut io.Writer, args []string) int {
 	}
 
 	buffer := new(bytes.Buffer)
-	if err := generate(buffer, pkgName, typName, flg.Args()); err != nil {
+	if err := generate(buffer, pkgName, typName, buildTags, flg.Args()); err != nil {
 		log.Printf("Can't generate code: %s", err)
 		return 1
 	}
