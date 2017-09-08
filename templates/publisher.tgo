@@ -1,13 +1,13 @@
 {{define "publisher"}}
-{{- $SubscriptionTypeName := printf "%sSubscription" .PublisherTypeName -}}
-{{- $SubscriberTypeName   := printf "%sSubscriber" .PublisherTypeName -}}
-{{- $EventTypeName        := printf "%sEvent" .PublisherTypeName -}}
+{{$SubscriptionTypeName := printf "%sSubscription" .PublisherTypeName}}
+{{$SubscriberTypeName   := printf "%sSubscriber" .PublisherTypeName}}
+{{$EventTypeName        := printf "%sEvent" .PublisherTypeName}}
 type {{$EventTypeName}} string
 
 const (
-    {{- range $eventName := .EventNames}}
+    {{range $eventName := .EventNames}}
     {{$.PublisherTypeName}}{{$eventName}} {{$EventTypeName}} = "{{$eventName}}"
-    {{- end}}
+    {{end}}
 )
 
 type {{$SubscriptionTypeName}} struct {
