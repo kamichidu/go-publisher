@@ -1,0 +1,9 @@
+{{define "subscriber"}}
+{{- $SubscriptionTypeName := printf "%sSubscription" .PublisherTypeName -}}
+{{- $SubscriberTypeName   := printf "%sSubscriber" .PublisherTypeName -}}
+type {{$SubscriberTypeName}} interface {
+    {{- range $eventName := .EventNames}}
+    On{{$eventName}}(ctx context.Context, {{printArgTypesOf $eventName}}) error
+    {{- end}}
+}
+{{end}}

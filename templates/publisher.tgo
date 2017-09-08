@@ -1,0 +1,53 @@
+{{define "publisher"}}
+{{- $SubscriptionTypeName := printf "%sSubscription" .PublisherTypeName -}}
+{{- $SubscriberTypeName   := printf "%sSubscriber" .PublisherTypeName -}}
+{{- $EventTypeName        := printf "%sEvent" .PublisherTypeName -}}
+type {{$EventTypeName}} string
+
+const (
+    {{- range $eventName := .EventNames}}
+    {{$.PublisherTypeName}}{{$eventName}} {{$EventTypeName}} = "{{$eventName}}"
+    {{- end}}
+)
+
+type {{$SubscriptionTypeName}} struct {
+    subscribers []{{$SubscriberTypeName}}
+
+    mu *sync.RWMutex
+}
+
+func New{{$SubscriptionTypeName}}() *{{$SubscriptionTypeName}} {
+    return &{{$SubscriptionTypeName}}{[]{{$SubscriberTypeName}}{}, new(sync.RWMutex)}
+}
+
+{{range $eventName := .EventNames}}
+func (self *{{$SubscriptionTypeName}}) Publish{{$eventName}}(ctx context.Context, {{printArgTypesOf $eventName}}) error {
+    for _, subscriber := range self.subscribers {
+        if err := subscriber.On{{$eventName}}(ctx, {{printArgsOf $eventName}}); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+{{end}}
+
+func (self *{{$SubscriptionTypeName}}) Subscribe(subscriber {{$SubscriberTypeName}}) {
+    self.mu.Lock()
+    defer self.mu.Unlock()
+
+    self.subscribers = append(self.subscribers, subscriber)
+}
+
+func (self *{{$SubscriptionTypeName}}) Unsubscribe(subscriber {{$SubscriberTypeName}}) {
+    self.mu.Lock()
+    defer self.mu.Unlock()
+
+    filtered := make([]{{$SubscriberTypeName}}, 0, len(self.subscribers))
+    for _, candidate := range self.subscribers {
+        if candidate != subscriber {
+            filtered = append(filtered, candidate)
+        }
+    }
+    self.subscribers = filtered
+}
+{{end}}
